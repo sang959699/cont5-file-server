@@ -1,0 +1,20 @@
+<form [formGroup]="loginForm" (ngSubmit)="authenticate(userName.value, password.value)">
+  <div class="row">
+    <div class="col-md-6 mx-auto mt-3">
+        <div class='input-group mb-3'>
+            <input type='text' class='form-control' placeholder='Username' formControlName="userName" tabindex="1" #userName />
+          </div> 
+          <div class='input-group mb-1'>
+            <input type='password' class='form-control' placeholder='Password' formControlName="password" tabindex="2" #password />
+          </div>
+          <div class="row">
+            <div class='col-md-6 mb-1 mt-1'></div>
+            <div class='col-md-6 mb-1 mt-1'>
+              <div class="d-grid gap-2">
+                <button tabindex="3" type="submit" [disabled]="isError" [ngClass]="{'btn': true, 'btn-outline-primary': !isError, 'btn-outline-danger': isError}">{{!isError ? 'Login' : 'Invalid'}}</button>
+              </div>
+            </div>
+          </div>
+      </div>
+  </div>
+</form>

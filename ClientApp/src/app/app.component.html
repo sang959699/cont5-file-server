@@ -1,0 +1,7 @@
+<body>
+  <ngx-loading-bar [includeSpinner]="false" color="#979591"></ngx-loading-bar>
+  <div class="container">
+    <app-nav-menu *ngIf="isLoggedIn"></app-nav-menu>
+    <router-outlet></router-outlet>
+  </div>
+</body>

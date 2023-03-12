@@ -1,0 +1,64 @@
+<form class="py-2 px-1" [formGroup]="auditLogFilterForm" (ngSubmit)="getAuditLog(auditLogFilterForm.value.endpoint, auditLogFilterForm.value.requestResponse, auditLogFilterForm.value.createdBy)">
+  <div class="row g-1">
+    <div class="col-md-3">
+      <input class="form-control" placeholder="Endpoint" formControlName="endpoint" />
+    </div>
+    <div class="col-md-3">
+      <input class="form-control" placeholder="Request / Response" formControlName="requestResponse" />
+    </div>
+    <div class="col-md-3">
+      <input class="form-control" placeholder="Created By" formControlName="createdBy" />
+    </div>
+    <div class="d-grid gap-2 col-md-3">
+      <button class="btn btn-outline-primary" type="submit">Filter</button>
+    </div>
+  </div>
+</form>
+<!-- Table View Below Here -->
+<table *ngIf="!isMobileLayout" class="table table-striped rounded-top">
+  <thead>
+  <tr>
+    <th scope="col">#</th>
+    <th scope="col" class="text-nowrap">Endpoint</th>
+    <th scope="col" class="text-nowrap">Request / Response</th>
+    <th scope="col" class="text-nowrap">Created By</th>
+    <th scope="col" class="text-nowrap">Created On</th>
+    <th scope="col" class="text-nowrap">Client IP</th>
+  </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let auditLog of auditLogList; index as i">
+      <th scope="row">{{ i + 1 }}</th>
+      <td>{{auditLog.api}}</td>
+      <td class="text-break">
+        <span class="font-weight-bold">Request:</span>&nbsp;{{auditLog.request}}<br />
+        <span class="font-weight-bold">Response:</span>&nbsp;{{auditLog.response}}
+      </td>
+      <td>{{auditLog.createdBy}}</td>
+      <td>{{auditLog.createdDt}}</td>
+      <td>{{auditLog.clientIp}}</td>
+    </tr>
+  </tbody>
+</table>
+<!-- Mobile View Below Here -->
+<table *ngIf="isMobileLayout" class="table table-striped rounded-top">
+  <thead>
+  <tr>
+    <th scope="col">#</th>
+    <th scope="col">Audit Log</th>
+  </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let auditLog of auditLogList; index as i">
+      <th scope="row">{{ i + 1 }}</th>
+      <td>
+        <h5>{{auditLog.api}}</h5>
+        <span class="font-weight-bold">Request:</span>&nbsp;<span class="text-break">{{ auditLog.request }}</span><br />
+        <span class="font-weight-bold">Response:</span>&nbsp;<span class="text-break">{{ auditLog.response }}</span><br />
+        <span class="font-weight-bold">Created By:</span>&nbsp;{{auditLog.createdBy}}<br />
+        <span class="font-weight-bold">Created On:</span>&nbsp;{{auditLog.createdDt}}<br />
+        <span class="font-weight-bold">Client IP:</span>&nbsp;{{auditLog.clientIp}}
+      </td>
+    </tr>
+  </tbody>
+</table>

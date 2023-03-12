@@ -1,0 +1,7 @@
+<button class="btn btn-outline-secondary mx-1" (click)="logout()"><fa-icon [icon]="faSignOutAlt"></fa-icon></button>
+<button [ngClass]='{ "btn": true, "btn-outline-primary": true, "mx-1": true, "active": currentRoute == "/fileList" || currentRoute == "/videoPlayer" || currentRoute == "/textEditor" }' routerLink="fileList" (click)="refreshfileList()"><fa-icon [icon]="faServer"></fa-icon></button>
+<button [ngClass]='{ "btn": true, "btn-outline-primary": true, "mx-1": true, "active": currentRoute == "/bookmark" }' routerLink="bookmark" (click)="refreshBookmark()"><fa-icon [icon]="faBookmark"></fa-icon></button>
+<button *ngIf="isAdminRole" [ngClass]='{ "btn": true, "btn-outline-info": true, "mx-1": true, "active": currentRoute == "/auditViewer" }' routerLink="auditViewer" (click)="refreshAuditViewer()"><fa-icon [icon]="faFileCode"></fa-icon></button>
+<button *ngIf="isAdminRole" [ngClass]='{ "btn": true, "btn-outline-success": failedDownloadFileCount == 0, "btn-outline-warning": failedDownloadFileCount > 0, "mx-1": true, "active": currentRoute == "/ariaNg" }' routerLink="ariaNg"><fa-icon [icon]="faCloudDownloadAlt"></fa-icon><fa-icon *ngIf="failedDownloadFileCount > 0" class="ms-2" [icon]="faExclamation"></fa-icon></button>
+<button [ngClass]='{ "btn": true, "btn-outline-info": true, "mx-1": true, "active": currentRoute == "/statsViewer" }' routerLink="statsViewer" (click)="refreshStatsViewer()"><fa-icon [icon]="faChartLine"></fa-icon></button>
+<hr class="mt-2 mb-0 opacity-100" />

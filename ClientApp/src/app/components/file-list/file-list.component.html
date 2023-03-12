@@ -1,0 +1,191 @@
+<div>
+  <!-- NavBar Start -->
+  <div class="ps-3">
+    <ul class="nav pt-0">
+      <li>
+          <a class="nav-link ps-0 fa-home" (click)="backPath(-1);"><fa-icon [icon]="faHome"></fa-icon></a>
+      </li>
+      <ng-container *ngIf="pathList.length > 0">
+        <li class="nav-item mt-2 pb-2" *ngFor="let path of pathList.slice(0, pathList.length - 1); let i = index">
+            <fa-icon [icon]="faChevronRight"></fa-icon>
+            <a class="nav-link d-inline" (click)="backPath(i)">{{path}}</a>
+        </li>
+      </ng-container>
+      <ng-container *ngIf="pathList.length > 0">
+        <li class="nav-item mt-2 pb-2">
+              <fa-icon [icon]="faChevronRight"></fa-icon>
+              <a class="nav-link d-inline" (click)="toggleFolderOption()">{{pathList[pathList.length - 1]}}
+                <span class="ps-1">
+                  <fa-icon rotate="{{isFolderOptionHide?'0':'180'}}" [icon]="faCaretDown" *ngIf="scanPathModel.showFolderOption" class="pe-2"></fa-icon>
+                </span>
+              </a>
+        </li>
+      </ng-container>
+    </ul>
+  </div>
+  <!-- NavBar End -->
+  <!-- Folder Option Start -->
+  <div class="mt-0 ms-1 mb-0 d-flex flex-wrap" *ngIf="showFolderOption && scanPathModel.showFolderOption" [@hideByVertical]="!isFolderOptionHide?'open':'closed'">
+    <div class="mx-1 mb-2" *ngIf="scanPathModel.isFolderCreatable">
+      <form [formGroup]="createFolderForm" (ngSubmit)="createNewFolder()">
+        <div class="input-group">
+          <input #txtFolderName [@hideByHorizontal]="isCreateFolderHide?'closed':'open'" class="form-control" type="text" placeholder="New Folder Name" formControlName="folderName">
+            <button [hidden]="isCreateFolderHide" [disabled]="createFolderForm.value.folderName?false:true" class="btn btn-outline-success" type="submit">Confirm</button>
+            <button [hidden]="!isCreateFolderHide" (click)="isCreateFolderHide = false; txtFolderName.focus();" [disabled]="!isCreateFolderHide" class="btn btn-outline-primary rounded" type="button">Create Folder</button>
+            <button [hidden]="isCreateFolderHide" (click)="isCreateFolderHide = true; createFolderForm.reset()" class="btn btn-outline-warning" type="button">Cancel</button>
+        </div>
+      </form>
+    </div>
+    <div class="mx-1 mb-2" *ngIf="scanPathModel.isMovable">
+      <form [formGroup]="moveFolderForm" (ngSubmit)="submitMove(scanPathModel.currentPath, moveFolderForm.value.movePath.path)">
+        <div class="btn-group" [autoClose]="'outside'" ngbDropdown #ddlMoveFolder="ngbDropdown">
+          <button class="btn btn-outline-primary dropdown-toggle" style="border-top-right-radius:0;border-bottom-right-radius:0;" ngbDropdownToggle type="button" [innerText]="moveFolderForm.value.movePath ? moveFolderForm.value.movePath.name : 'Move To'"></button>
+          <div [ngClass]="{'pre-scrollable': isMobile()}" ngbDropdownMenu>
+            <ng-container *ngIf='scanPathModel.movableFolderPath.length > 0'>
+              <a class="cursor-pointer" *ngFor="let item of scanPathModel.movableFolderPath; let i = index" ngbDropdownItem (click)="ddlMoveFolder.close(); moveFolderForm.value.movePath = item;">{{item.name}}</a>
+              <div class="dropdown-divider"></div>
+            </ng-container>
+            <ng-container *ngIf='movableAnimePath'>
+              <a class="cursor-pointer" *ngFor="let item of movableAnimePath; let i = index" ngbDropdownItem (click)="ddlMoveFolder.close(); moveFolderForm.value.movePath = item;">{{item.name}}</a>
+            </ng-container>
+          </div>
+          <button class="btn btn-outline-success" [@hideByHorizontal]="moveFolderForm.value.movePath?'open':'closed'" type="submit" [disabled]="isMoveSubmitted">Confirm</button>
+          <button class="btn btn-outline-warning rounded-end" type="button" (click)="moveFolderForm.value.movePath = null" [@hideByHorizontal]="moveFolderForm.value.movePath?'open':'closed'">Cancel</button>
+          <input type="hidden" formControlName="movePath">
+        </div>
+      </form>
+    </div>
+    <div class="mx-1 mb-2">
+      <form (ngSubmit)="toggleVideoOnly()">
+        <button class="btn btn-outline-success">{{this.showVideoOnly ? 'Show All' : 'Video Only'}}</button>
+      </form>
+    </div>
+    <div class="mx-1 mb-2" *ngIf="scanPathModel.isBookmarkable">
+      <form (ngSubmit)="addBookmark(scanPathModel.currentPath)">
+        <button class="btn btn-outline-success" *ngIf="countBookmarkSubmitted == 0">Bookmark</button>
+        <button class="btn btn-outline-success" *ngIf="countBookmarkSubmitted >= 1" [disabled]="countBookmarkSubmitted == 2">Confirm</button>
+      </form>
+    </div>
+    <div class="mx-1 mb-2" *ngIf="scanPathModel.isDeletable">
+      <form (ngSubmit)="deleteFile(scanPathModel.currentPath)">
+        <button class="btn btn-outline-danger" *ngIf="countDeleteSubmitted == 0">Delete</button>
+        <button class="btn btn-outline-danger" *ngIf="countDeleteSubmitted >= 1" [disabled]="countDeleteSubmitted == 2">Confirm</button>
+      </form>
+    </div>
+  </div>
+  <!-- Folder Option End -->
+  <!-- FileList Start -->
+  <div id="divFileList" *ngIf="scanPathModel.isDirectory">
+      <ul class="nav flex-column">
+          <li class="nav-item" *ngFor="let folder of scanPathModel.folderList; let i = index">
+            <div class="nav-link" (click)="nextPath(folder.name)">
+              <fa-icon [icon]="faFolder" class="pe-2"></fa-icon>
+              <fa-icon [icon]="faClock" class="pe-2" *ngIf="folder.isNew"></fa-icon>
+              <a>{{folder.name}}</a>
+            </div>
+          </li>
+      </ul>
+      <ul class="nav flex-column">
+        <li class="nav-item" *ngFor="let file of scanPathModel.fileList; let i = index">
+          <div class="nav-link" (click)="nextPath(file.name)">
+            <!-- <fa-icon [icon]="(file.type == 1 ? faYoutube : faFile)" class="pe-2"></fa-icon> -->
+            <fa-icon [icon]="faFile" class="pe-2" *ngIf="file.type != 1"></fa-icon>
+            <div class="btn-group pe-2" role="group" *ngIf="file.type == 1">
+              <ng-container *ngIf='file.fileListProp.showDownloadButton'>
+                <button appStopPropagation *ngIf="isIos()" class="btn btn-outline-success py-1 mt-n1" (click)="downloadFile(file, 1)"><fa-icon [icon]="faLink"></fa-icon></button>
+                <button appStopPropagation *ngIf="isMobile() && !isIos()" class="btn btn-outline-success py-1 mt-n1" (click)="downloadFile(file, 2)"><fa-icon [icon]="faPlay"></fa-icon></button>
+                <button appStopPropagation *ngIf="!isMobile()" class="btn btn-outline-success py-1 mt-n1" (click)="downloadFile(file, 3)"><fa-icon [icon]="faPlay"></fa-icon></button>
+              </ng-container>
+              <ng-container *ngIf='file.fileListProp.showDownloadSubtitleButton'>
+                <button appStopPropagation class="btn btn-outline-info py-1 mt-n1" (click)="downloadSubtitle(file);"><fa-icon [icon]="faCode"></fa-icon></button>
+              </ng-container>
+              <ng-container *ngIf='file.fileListProp.showWatchedButton'>
+                <button appStopPropagation class="btn btn-outline-info py-1 mt-n1" (click)="submitWatched(file.name);"><fa-icon [icon]="(file.isWatched ? faCheck : faTimes)"></fa-icon></button>
+              </ng-container>
+              <ng-container *ngIf='file.animeName && roleId <= 1'>
+                <button appStopPropagation class="btn py-1 mt-n1" [ngClass]="{'btn-outline-primary': isMoveFromFileListIndex != i, 'btn-outline-warning': isMoveFromFileListIndex == i}" (click)="submitMoveFromFileList(file.name, file.animeName, i);"><fa-icon [icon]="(isMoveFromFileListIndex == i ? faCheck : faArchive)"></fa-icon></button>
+              </ng-container>
+            </div>
+            <fa-icon [icon]="faClock" class="pe-2" *ngIf="file.isNew && !file.isWatched"></fa-icon>
+            <fa-icon [icon]="faFlag" class="pe-2" *ngIf="file.note"></fa-icon>
+            <a><ng-container *ngIf='file.animeName'>{{file.animeName}} : </ng-container>{{file.name}}</a>
+          </div>
+        </li>
+      </ul>
+      <ul class="nav flex-column" *ngIf="scanPathModel.folderList?.length === 0 && scanPathModel.fileList?.length === 0">
+        <li class="nav-item">
+          <a class="nav-link" (click)="backPath(pathList.length - 2)"><fa-icon [icon]="faArrowLeft" class="pe-2"></fa-icon>No Item</a>
+        </li>
+      </ul>
+  </div>
+  <!-- FileList End -->
+  <!-- FileDetail Start -->
+  <div class="container-fluid" *ngIf='!scanPathModel.isDirectory && fileDetails'>
+    <div class="row">
+      <div class="col ps-0 pe-0">
+        <ul id="ulFile" class="nav flex-column">
+          <li *ngIf="fileDetails.type==1 && fileDetails.animeName && roleId > 1" class="grey-text">
+            Anime Name: {{fileDetails.animeName}}
+          </li>
+          <li *ngIf="fileDetails.type==1 && roleId <= 1 && !isCreateSubmitMode">
+            <form [formGroup]="moveFileForm" class="d-inline-flex" (ngSubmit)="submitMove(scanPathModel.currentPath, moveFileForm.value.movePath)">
+              <ng-select
+              [items]="movableAnimePath"
+              bindLabel="name"
+              bindValue="path"
+              [searchable]="false"
+              placeholder="Anime"
+              formControlName="movePath"
+              (change)="pushMovePath()">
+              </ng-select>
+              <button type="submit" class="btn btn-outline-primary ms-2" appBtnMove [disabled]="isMoveSubmitted">Move</button>
+              <button type="button" class="btn btn-outline-primary ms-2" [disabled]="isMoveSubmitted" (click)="isCreateSubmitMode = true">New</button>
+            </form>
+          </li>
+          <li *ngIf="fileDetails.type==1 && roleId <= 1  && isCreateSubmitMode">
+            <form [formGroup]="createMoveFileForm" class="d-inline-flex" (ngSubmit)="submitCreateMove(scanPathModel.currentPath, createMoveFileForm.value.createMovePath)">
+              <input type="text" class="form-control" formControlName="createMovePath" placeholder="Folder Name" />
+              <button type="submit" class="btn btn-outline-primary ms-2" [disabled]="!createMoveFileForm.value.createMovePath || isMoveSubmitted">Move</button>
+              <button type="button" class="btn btn-outline-primary ms-2" [disabled]="isMoveSubmitted" (click)="isCreateSubmitMode = false">Cancel</button>
+            </form>
+          </li>
+          <li *ngIf="roleId <= 2">
+            <form class="d-inline-flex" [formGroup]="submitNoteForm" (ngSubmit)="submitNote(this.submitNoteForm.value.note);">
+              <div class="input-group">
+                <input appTxtNumericOnly inputmode="numeric" maxlength="6" class="form-control" placeholder="Note" formControlName="note" #txtNote />
+                <span class="input-group-text">{{fileDetails.note}}</span>
+              </div>
+              <button class="btn ms-2 btn-outline-primary" [disabled]="!this.submitNoteForm.value.note" type="submit">Save</button>
+              <button class="btn ms-2 btn-outline-primary" (click)="this.submitNoteForm.value.note = ''; txtNote.value = '';" [disabled]="!fileDetails.note">Clear</button>
+            </form>
+          </li>
+          <li *ngIf="roleId <= 2 ? (fileDetails.type == 1 || (roleId <= 1 && scanPathModel.isDeletable)) : false">
+            <div class="d-inline-flex">
+              <button *ngIf="fileDetails.type == 1" class="btn btn-outline-primary me-2" (click)="submitWatched()">{{fileDetails.isWatched ? 'unWatched' : 'Watched'}}</button>
+              <form class="d-inline-flex" (ngSubmit)="deleteFile(scanPathModel.currentPath)" *ngIf="scanPathModel.isDeletable">
+               <button class="btn btn-outline-danger" *ngIf="countDeleteSubmitted == 0">Delete</button>
+               <button class="btn btn-outline-danger" *ngIf="countDeleteSubmitted >= 1" [disabled]="countDeleteSubmitted == 2">Confirm</button>
+              </form>
+            </div>
+          </li>
+          <li *ngIf="(fileDetails.type==1 && isMobile() && !isIos() || fileDetails.subtitleUrl)">
+            <ng-container *ngIf="isMobile() && !isIos()">
+              <button class="btn btn-outline-primary" (click)="redirect(customPlayModel?.mxLink)">MX Play</button>
+              <button *ngIf="customPlayModel?.resumeLink" class="btn btn-outline-primary ms-2" (click)="redirect(customPlayModel?.resumeLink)">MX Resume</button>
+            </ng-container>
+            <button *ngIf="fileDetails.subtitleUrl" [ngClass]="{'ms-2': isMobile() && !isIos()}" class="btn btn-outline-primary" (click)="redirect(fileDetails.subtitleUrl)">Subtitle</button>
+          </li>
+          <li>
+            <div>
+              <a class="btn btn-outline-primary" [href]="fileDetails.link"><fa-icon [icon]="faDownload" class="me-2"></fa-icon>Download</a>
+              <button *ngIf="fileDetails.type==1 && !isMobile()" class="btn btn-outline-primary ms-2" (click)="redirect(customPlayModel?.windowsLink)"><fa-icon [icon]="faPlay" class="me-2"></fa-icon>{{customPlayModel?.windowsPlayer}}</button>
+              <button *ngIf="fileDetails.type==1" class="btn btn-outline-primary ms-2" routerLink="/videoPlayer"><fa-icon [icon]="faYoutube" class="me-2"></fa-icon>Web</button>
+              <button *ngIf="fileDetails.type==2 && roleId <= 1" class="btn btn-outline-primary ms-2" routerLink="/textEditor"><fa-icon [icon]="faPen" class="me-2"></fa-icon>Edit</button>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <!-- FileDetail End -->
+</div>

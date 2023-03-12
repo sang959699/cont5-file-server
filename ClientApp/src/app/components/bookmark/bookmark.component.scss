@@ -1,0 +1,31 @@
+li a:not(.btn),
+fa-icon {
+    text-decoration: none;
+    color: rgb(151, 149, 145);
+    cursor: pointer;
+}
+li a:not(.btn):hover, .hover-blue:hover, .color-grey-hover-blue:hover, .fa-home:hover fa-icon, div.nav-link:hover a, div.nav-link:hover {
+    text-decoration: none;
+    color: rgb(12, 92, 180);
+    cursor: pointer;
+}
+#divFileList ul li:not(:first-child) {
+    border-top: 0.1px solid rgb(151, 149, 145);
+    word-break: break-all;
+}
+#ulFile li:not(:first-child) {
+    border-top: 0.1px solid rgb(151, 149, 145);
+    padding: .5rem .1rem;
+}
+#ulFile li {
+    padding: .5rem .1rem;
+}
+hr {
+    background-color: rgb(151, 149, 145);
+    height: 1.5px;
+}
+ng-select { .ng-dropdown-panel { min-width: 200px !important; } } 
+ng-select { min-width: 200px !important; }
+.cursor-pointer {
+    cursor: pointer;
+}

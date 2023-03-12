@@ -1,0 +1,20 @@
+<div id="divFileList">
+  <ul class="nav flex-column">
+    <li class="nav-item" *ngFor="let item of bookmark; let i = index">
+      <div class="nav-link" (click)="goBookmark(item.path)">
+        <fa-icon [icon]="faStar" class="pe-2"></fa-icon>
+        <div class="btn-group pe-2" role="group">
+          <form (ngSubmit)="deleteBookmark(item.path)">
+            <button appBtnDeleteBookmark appStopPropagation class="btn btn-outline-info py-1 mt-n1"><fa-icon [icon]="faTimes"></fa-icon></button>
+          </form>
+        </div>
+        <a>{{item.name}}</a>
+      </div>
+    </li>
+  </ul>
+  <ul class="nav flex-column" *ngIf="bookmark?.length === 0">
+    <li class="nav-item">
+      <a class="nav-link" (click)="goFileList()"><fa-icon [icon]="faArrowLeft" class="pe-2"></fa-icon>No Item</a>
+    </li>
+  </ul>
+</div>

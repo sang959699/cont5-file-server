@@ -1,0 +1,59 @@
+<!-- Table View Below Here -->
+<ng-container *ngIf='!isMobileLayout'>
+  <table *ngIf='roleId <= 1' class="table table-striped rounded-top">
+    <thead>
+      <tr>
+        <th scope="col">Timespan</th>
+        <th scope="col">EPs</th>
+        <th scope="col">Duration</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of pendingStatsList?.data; index as i">
+        <td>{{item[0]}}</td>
+        <td>{{item[2]}}</td>
+        <td>{{item[1]}}</td>
+      </tr>
+    </tbody>
+  </table>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th scope="col">Timespan</th>
+        <th scope="col">EPs</th>
+        <th scope="col">Duration</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of watchedStatsList?.data; index as i">
+        <td>{{item[0]}}</td>
+        <td>{{item[2]}}</td>
+        <td>{{item[1]}}</td>
+      </tr>
+    </tbody>
+  </table>
+</ng-container>
+<!-- Mobile View Below Here -->
+<ng-container *ngIf='isMobileLayout'>
+  <table class="table table-striped rounded-top">
+    <thead>
+    <tr>
+      <th scope="col">Timespan</th>
+    </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of pendingStatsList?.data; index as i">
+        <td>
+          <h5>{{item[0]}}</h5>
+          <span>{{item[2]}} EPs ({{item[1]}})</span>
+        </td>
+      </tr>
+      <tr *ngFor="let item of watchedStatsList?.data; index as i">
+        <td>
+          <h5>{{item[0]}}</h5>
+          <span>{{item[2]}} EPs ({{item[1]}})</span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</ng-container>

@@ -1,0 +1,29 @@
+<div>
+  <!-- NavBar Start -->
+  <div class="ps-3">
+    <ul class="nav pt-0">
+      <li>
+          <a class="nav-link ps-0 fa-home" routerLink="/fileList"><fa-icon [icon]="faArrowLeft" class="pe-2"></fa-icon>Back</a>
+      </li>
+    </ul>
+  </div>
+  <!-- NavBar End -->
+  <div class="container-fluid" *ngIf="fileDetails != null">
+    <div class="row">
+      <div class="col ps-0 pe-0">
+        <ul id="ulFile" class="nav flex-column">
+          <li class="text">
+            Now Playing: {{fileDetails?.name}}
+          </li>
+          <li>
+            <vg-player>
+              <video [vgMedia]="media" #media id="singleVideo" preload="auto" controls>
+                  <source src="{{fileDetails?.link}}" type="video/mp4">
+              </video>
+            </vg-player>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
